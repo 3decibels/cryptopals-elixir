@@ -19,6 +19,7 @@ defmodule Cryptopals do
     |> Base.encode64()
   end
 
+
   @doc """
   Performs an XOR on two hex strings of equal size
   Assumes input is lowercase
@@ -34,6 +35,7 @@ defmodule Cryptopals do
     |> Integer.to_string(16)
     |> String.downcase
   end
+
 
   @doc """
   Decodes a hex string that has been XORed against a single character and
@@ -52,7 +54,7 @@ defmodule Cryptopals do
             Bitwise.bxor(x, char)
           end)
           |> List.to_string
-        [{_plaintext, score}] = Cryptopals.Language.score_language([plaintext], :english)
+        {_plaintext, _frequencies, score} = Cryptopals.Language.score_language(plaintext)
         {score, char, plaintext}
     end
     plaintexts
