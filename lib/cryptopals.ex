@@ -35,4 +35,30 @@ defmodule Cryptopals do
     |> String.downcase
   end
 
+  @doc """
+  Decodes a hex string that has been XORed against a single character and
+  determines which character it was most likely XORed against
+  """
+  def decrypt_single_xored_hex(hex) when is_binary(hex) do
+    ciphertext =
+      hex
+      |> Base.decode16!(case: :lower)
+      |> String.to_charlist
+    plaintexts =
+      for char <- 0..256 do
+        plaintext =
+          ciphertext
+          |> Enum.map(fn x ->
+            Bitwise.bxor(x, char)
+          end)
+          |> List.to_string
+        [{_plaintext, score}] = Cryptopals.Language.score_language([plaintext], :english)
+        {score, char, plaintext}
+    end
+    plaintexts
+      |> Enum.sort(fn ({x, _, _}, {y, _, _}) ->
+        x >= y
+      end)
+  end
+
 end
