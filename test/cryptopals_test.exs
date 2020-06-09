@@ -9,4 +9,8 @@ defmodule CryptopalsTest do
   test "Fixed XOR on hex" do
     assert Cryptopals.fixed_xor("1c0111001f010100061a024b53535009181c", "686974207468652062756c6c277320657965") == "746865206b696420646f6e277420706c6179"
   end
+
+  test "Single byte XOR cipher" do
+  	assert Cryptopals.decrypt_single_xored_hex("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736") == "Cooking MC's like a pound of bacon"
+  end
 end

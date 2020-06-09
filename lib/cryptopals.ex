@@ -51,18 +51,17 @@ defmodule Cryptopals do
       for char <- 0..256 do
         plaintext =
           ciphertext
-          |> Enum.map(fn x ->
-            Bitwise.bxor(x, char)
-          end)
+          |> Enum.map(fn x -> Bitwise.bxor(x, char) end)
           |> List.to_string
         {_plaintext, score, _frequencies} = Cryptopals.Language.score_language(plaintext)
         {score, char, plaintext}
     end
 
-    plaintexts
-      |> Enum.sort(fn ({x, _, _}, {y, _, _}) ->
-        y >= x
-      end)
+    [{_score, _char, decrypted_plaintext} | _tail] =
+      plaintexts
+      |> Enum.sort(fn ({x, _, _}, {y, _, _}) -> x <= y end)
+    
+    decrypted_plaintext
   end
 
 end
