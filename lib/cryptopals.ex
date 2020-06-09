@@ -46,6 +46,7 @@ defmodule Cryptopals do
       hex
       |> Base.decode16!(case: :lower)
       |> String.to_charlist
+
     plaintexts =
       for char <- 0..256 do
         plaintext =
@@ -54,12 +55,13 @@ defmodule Cryptopals do
             Bitwise.bxor(x, char)
           end)
           |> List.to_string
-        {_plaintext, _frequencies, score} = Cryptopals.Language.score_language(plaintext)
+        {_plaintext, score, _frequencies} = Cryptopals.Language.score_language(plaintext)
         {score, char, plaintext}
     end
+
     plaintexts
       |> Enum.sort(fn ({x, _, _}, {y, _, _}) ->
-        x >= y
+        y >= x
       end)
   end
 

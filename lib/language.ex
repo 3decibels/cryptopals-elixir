@@ -9,6 +9,7 @@ defmodule Cryptopals.Language do
 
   @doc """
   Scores phrase based on the likelihood of it being an example of the selected language
+  Lower scores are better
   Currently only English is supported
   """
   def score_language(phrase, :english) when is_binary(phrase) do
@@ -28,14 +29,22 @@ defmodule Cryptopals.Language do
         deviation = abs(expectedfreq[String.to_charlist(<<char>>)] - freq)
         {char, instances, freq, deviation}
       end
-#    instances = Enum.count charlist, fn(char) ->
-#      Enum.member?(List.to_charlist(Map.keys(expectedfreq)), char)
-#    end
+
     score = 
       frequencies
       |> Enum.map(fn {_char, _instances, _freq, deviation} -> deviation end)
       |> Enum.reduce(fn x, acc -> x + acc end)
     score = score / Enum.count(frequencies)
-    {phrase, frequencies, score}
+
+    # Add average word length into the mix
+    avg_word_length =
+      phrase
+      |> String.split
+      |> Enum.map(fn x -> String.length(x) end)
+      |> Enum.reduce(fn x, acc -> x + acc end)
+      |> div(Enum.count(String.split(phrase)))
+    score = (abs(avg_word_length - 7.0) * 0.5 + score) / 4
+
+    {phrase, score, frequencies}
   end
 end
