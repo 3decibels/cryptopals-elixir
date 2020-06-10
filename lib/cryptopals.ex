@@ -42,26 +42,29 @@ defmodule Cryptopals do
   determines which character it was most likely XORed against
   """
   def decrypt_single_xored_hex(hex) when is_binary(hex) do
-    ciphertext =
-      hex
-      |> Base.decode16!(case: :lower)
-      |> String.to_charlist
+    ciphertext = Cryptopals.Util.hex_to_charlist(hex)
 
     plaintexts =
       for char <- 0..256 do
-        plaintext =
-          ciphertext
-          |> Enum.map(fn x -> Bitwise.bxor(x, char) end)
-          |> List.to_string
+        plaintext = decrypt_single_char_xor(ciphertext, char)
         {_plaintext, score, _frequencies} = Cryptopals.Language.score_language(plaintext)
         {score, char, plaintext}
     end
 
-    [{_score, _char, decrypted_plaintext} | _tail] =
-      plaintexts
-      |> Enum.sort(fn ({x, _, _}, {y, _, _}) -> x <= y end)
+    [{_score, _char, decrypted_plaintext} | _tail] = Enum.sort plaintexts, fn({x, _, _}, {y, _, _}) -> x <= y end
     
     decrypted_plaintext
+  end
+
+
+  @doc """
+  Decrypts a ciphertest using a single character XOR as the key
+  Returns plaintext as a string
+  """
+  def decrypt_single_char_xor(ciphertext, char) when is_list(ciphertext) and is_integer(char) do
+    ciphertext
+    |> Enum.map(fn x -> Bitwise.bxor(x, char) end)
+    |> List.to_string
   end
 
 end
