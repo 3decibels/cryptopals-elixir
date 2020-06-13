@@ -17,7 +17,7 @@ defmodule CryptopalsTest do
   @tag set: 1
   @tag challenge: 3
   test "Single byte XOR cipher" do
-  	assert Cryptopals.decrypt_single_xored_hex("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736") == "Cooking MC's like a pound of bacon"
+  	assert Cryptopals.decrypt_single_xored_hex("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736") == {"Cooking MC's like a pound of bacon", 1.3854411764705883}
   end
 
 end

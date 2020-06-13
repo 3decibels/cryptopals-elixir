@@ -15,19 +15,19 @@ defmodule Cryptopals.Language do
   def score_language(phrase, :english) when is_binary(phrase) do
     # Letter frequencies taken from http://pi.math.cornell.edu/~mec/2003-2004/cryptography/subs/frequencies.html
     # Additional insights such as average word length from http://norvig.com/mayzner.html
-    expectedfreq = %{'E' => 12.02, 'T' => 9.10, 'A' => 8.12, 'O' => 7.68, 'I' => 7.31, 'N' => 6.95,
-                     'S' => 6.28, 'R' => 6.02, 'H' => 5.92, 'D' => 4.32, 'L' => 3.98, 'U' => 2.88}
+    expectedfreq = %{"E" => 12.02, "T" => 9.10, "A" => 8.12, "O" => 7.68, "I" => 7.31, "N" => 6.95,
+                     "S" => 6.28, "R" => 6.02, "H" => 5.92, "D" => 4.32, "L" => 3.98, "U" => 2.88}
     charlist =
       phrase
       |> String.upcase
-      |> String.to_charlist
+      |> String.graphemes
 
     charlist_length = Enum.count(charlist)
     frequencies =
-      for char <- List.to_charlist(Map.keys(expectedfreq)) do
+      for char <- Map.keys(expectedfreq) do
         instances = Enum.count(charlist, fn x -> x == char end)
         freq = instances / charlist_length * 100
-        deviation = abs(expectedfreq[String.to_charlist(<<char>>)] - freq)
+        deviation = abs(expectedfreq[char] - freq)
         {char, instances, freq, deviation}
       end
 
