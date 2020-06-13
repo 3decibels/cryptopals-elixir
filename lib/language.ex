@@ -16,7 +16,8 @@ defmodule Cryptopals.Language do
     # Letter frequencies taken from http://pi.math.cornell.edu/~mec/2003-2004/cryptography/subs/frequencies.html
     # Additional insights such as average word length from http://norvig.com/mayzner.html
     expectedfreq = %{"E" => 12.02, "T" => 9.10, "A" => 8.12, "O" => 7.68, "I" => 7.31, "N" => 6.95,
-                     "S" => 6.28, "R" => 6.02, "H" => 5.92, "D" => 4.32, "L" => 3.98, "U" => 2.88}
+                     "S" => 6.28, "R" => 6.02, "H" => 5.92, "D" => 4.32, "L" => 3.98, "U" => 2.88,
+                     " " => 10}
     charlist =
       phrase
       |> String.upcase
