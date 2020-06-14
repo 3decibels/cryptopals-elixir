@@ -92,8 +92,12 @@ defmodule Cryptopals do
     |> Stream.map(&String.trim/1)
     |> Stream.map(&(Base.decode16!(&1, case: :lower)))
     |> Stream.map(&Cryptopals.decrypt_single_xored_ciphertext/1)
-    |> Enum.sort(fn({_, x}, {_, y}) -> x <= y end)
-    |> List.first
+    |> Enum.reduce(fn({_, x_score} = x, {_, y_score} = y) ->
+        cond do
+          x_score <= y_score -> x
+          true -> y
+        end
+      end)
   end
 
 end
