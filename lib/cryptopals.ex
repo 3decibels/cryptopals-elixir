@@ -56,10 +56,11 @@ defmodule Cryptopals do
     plaintexts =
       for char <- 0..256 do
         plaintext = decrypt_single_char_xor(ciphertext, char)
-        {_plaintext, score, _frequencies} = Cryptopals.Language.score_language(plaintext)
+        {_plaintext, score} = Cryptopals.Language.score_language(plaintext)
         {score, char, plaintext}
     end
 
+    plaintexts = Enum.filter(plaintexts, fn {x, _, _} -> x != 0 end)
     [{score, _char, decrypted_plaintext} | _tail] = Enum.sort plaintexts, fn({x, _, _}, {y, _, _}) -> x <= y end
     
     {decrypted_plaintext, score}
@@ -92,6 +93,7 @@ defmodule Cryptopals do
     |> Stream.map(&(Base.decode16!(&1, case: :lower)))
     |> Stream.map(&Cryptopals.decrypt_single_xored_ciphertext/1)
     |> Enum.sort(fn({_, x}, {_, y}) -> x <= y end)
+    |> List.first
   end
 
 end

@@ -10,15 +10,22 @@ defmodule CryptopalsTest do
 
   @tag set: 1
   @tag challenge: 2
-  test "Fixed XOR on hex" do
+  test "Fixed XOR" do
     assert Cryptopals.fixed_xor("1c0111001f010100061a024b53535009181c", "686974207468652062756c6c277320657965") == "746865206b696420646f6e277420706c6179"
   end
 
   @tag set: 1
   @tag challenge: 3
-  test "Single byte XOR cipher" do
-  	{plaintext, _score} = Cryptopals.decrypt_single_xored_hex("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
-  	assert plaintext == "Cooking MC's like a pound of bacon"
+  test "Single-byte XOR cipher" do
+    {plaintext, _score} = Cryptopals.decrypt_single_xored_hex("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
+    assert plaintext == "Cooking MC's like a pound of bacon"
+  end
+
+  @tag set: 1
+  @tag challenge: 4
+  test "Detect single-character XOR" do
+    {plaintext, _score} = Cryptopals.detect_xor_from_file("data/4.txt")
+    assert plaintext == "Now that the party is jumping\n"
   end
 
 end
