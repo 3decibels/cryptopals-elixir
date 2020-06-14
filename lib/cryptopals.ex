@@ -60,7 +60,6 @@ defmodule Cryptopals do
         {score, char, plaintext}
     end
 
-    plaintexts = Enum.filter(plaintexts, fn {x, _, _} -> x != 0 end)
     [{score, _char, decrypted_plaintext} | _tail] = Enum.sort plaintexts, fn({x, _, _}, {y, _, _}) -> x <= y end
     
     {decrypted_plaintext, score}
