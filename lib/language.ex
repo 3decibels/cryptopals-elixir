@@ -29,16 +29,15 @@ defmodule Cryptopals.Language do
       |> String.upcase
       |> String.graphemes
       |> Enum.frequencies
-      |> Enum.map(fn {char, freq} ->
-        cond do
-          Map.has_key?(expectedfreq, char) ->
-            expected = (expectedfreq[char] / 100) * phraselength
-            :math.pow(expected - freq, 2) / expected
-          true ->
-            :math.pow(0 - freq, 2) / 0.00001
-        end
+      |> Enum.reduce(0, fn({char, freq}, acc) ->
+          cond do
+            Map.has_key?(expectedfreq, char) ->
+              expected = (expectedfreq[char] / 100) * phraselength
+              (:math.pow(expected - freq, 2) / expected) + acc
+            true ->
+              (:math.pow(0 - freq, 2) / 0.00001) + acc
+          end
         end)
-      |> Enum.sum
       |> :math.sqrt()
 
     {phrase, score}
