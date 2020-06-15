@@ -73,7 +73,7 @@ defmodule Cryptopals do
 
     ## Examples
 
-      iex(32)> Cryptopals.decrypt_single_char_xor(<<27, 55, 55, 51, 49, 54, 63>>, ?X)
+      iex> Cryptopals.decrypt_single_char_xor(<<27, 55, 55, 51, 49, 54, 63>>, ?X)
       "Cooking"
 
   """
@@ -97,6 +97,28 @@ defmodule Cryptopals do
           true -> y
         end
       end)
+  end
+
+
+  @doc """
+  Encrypts a plaintext with repeating key XOR
+  Returns the hex encoded encrypted ciphertext
+
+    ## Examples
+
+      iex(18)> Cryptopals.repeating_key_xor("I go crazy when I hear a cymbal", "ICE")
+      "0063222663263b223f30633221262b690a652126243b632469203c24212425"
+
+  """
+  def repeating_key_xor(plaintext, key) when is_binary(plaintext) and is_binary(key) do
+    keylength = String.length(key)
+    plaintext
+    |> String.graphemes
+    |> Stream.chunk_every(keylength)
+    |> Enum.reduce("", fn(x, acc) ->
+        acc <> :crypto.exor(x, String.slice(key, 0..(Enum.count(x) - 1)))
+      end)
+    |> Base.encode16(case: :lower)
   end
 
 end
