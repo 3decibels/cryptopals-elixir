@@ -24,7 +24,7 @@ defmodule Cryptopals.Util do
   end
 
 
-  def compute_hamming(<<x::1, x_tail::bitstring>>, <<y::1, y_tail::bitstring>>, acc) do
+  defp compute_hamming(<<x::1, x_tail::bitstring>>, <<y::1, y_tail::bitstring>>, acc) do
     cond do
       x == y ->
         compute_hamming(x_tail, y_tail, acc)
@@ -34,6 +34,6 @@ defmodule Cryptopals.Util do
   end
 
 
-  def compute_hamming(_, _, acc), do: acc
+  defp compute_hamming(_, _, acc), do: acc
 
 end
