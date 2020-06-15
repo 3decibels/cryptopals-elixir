@@ -1,6 +1,7 @@
 defmodule CryptopalsTest do
   use ExUnit.Case
   doctest Cryptopals
+  doctest Cryptopals.Util
 
   @tag set: 1
   @tag challenge: 1
