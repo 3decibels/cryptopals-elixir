@@ -44,12 +44,12 @@ defmodule Cryptopals.Util do
 
     ## Examples
 
-      iex> Cryptopals.Util.find_average_hamming_distances("Test string", 2..5)
+      iex> Cryptopals.Util.find_average_hamming_distances("String for testing Hamming distance", 2..5)
       [
-        {2, 0.16666666666666666},
-        {4, 0.3333333333333333},
-        {5, 0.5333333333333333},
-        {3, 0.7777777777777777}
+        {4, 2.5833333333333335},
+        {3, 2.777777777777778},
+        {5, 2.8000000000000003},
+        {2, 2.8333333333333335}
       ]
 
   """
@@ -65,12 +65,12 @@ defmodule Cryptopals.Util do
 
     ## Examples
 
-      iex> Cryptopals.Util.find_average_hamming_distances("Test string", 2..5, 7)
+      iex> Cryptopals.Util.find_average_hamming_distances("String for testing Hamming distance", 2..5, 5)
       [
-        {4, 0.32142857142857145},
-        {2, 0.42857142857142855},
-        {5, 0.5142857142857143},
-        {3, 0.7142857142857143}
+        {5, 2.6000000000000005},
+        {4, 2.65},
+        {3, 2.8},
+        {2, 3.1}
       ]
 
   """
@@ -78,7 +78,7 @@ defmodule Cryptopals.Util do
     Stream.map(range, fn keysize ->
       total_norm_distance = Enum.reduce(0..(rounds - 1), 0, fn iteration, acc ->
         offset = keysize * iteration
-        <<_::bits-size(offset), x::bits-size(keysize), y::bits-size(keysize), _::bitstring>> = data
+        <<_::bytes-size(offset), x::bytes-size(keysize), y::bytes-size(keysize), _::binary>> = data
         acc + (Cryptopals.Util.hamming_distance(x, y) / keysize)
       end)
       avg_norm_distance = total_norm_distance / rounds
