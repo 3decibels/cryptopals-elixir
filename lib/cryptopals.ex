@@ -106,7 +106,7 @@ defmodule Cryptopals do
 
     ## Examples
 
-      iex(18)> Cryptopals.repeating_key_xor("I go crazy when I hear a cymbal", "ICE")
+      iex> Cryptopals.repeating_key_xor("I go crazy when I hear a cymbal", "ICE")
       "0063222663263b223f30633221262b690a652126243b632469203c24212425"
 
   """
@@ -119,6 +119,27 @@ defmodule Cryptopals do
         acc <> :crypto.exor(x, String.slice(key, 0..(Enum.count(x) - 1)))
       end)
     |> Base.encode16(case: :lower)
+  end
+
+
+  @doc """
+  Reads in data and breaks repeating key XOR (Vigenere) encryption.
+  Returns the decrypted plaintext and the key
+  """
+  def decrypt_repeating_key_xor(data, min_keysize, max_keysize) when is_binary(data) and is_integer(min_keysize) and is_integer(max_keysize) do
+    Cryptopals.Util.find_average_hamming_distances(data, 2..40)
+    # |> MORE CHALLENGE 6 WORK HERE
+  end
+
+
+  @doc """
+  Reads in base64 encoded data from a file and breaks repeating key XOR (Vigenere) encryption.
+  Returns the decrypted plaintext and the key
+  """
+  def decrypt_repeating_key_xor_from_file(path) when is_binary(path) do
+    File.read!(path)
+    |> Base.decode64!(ignore: :whitespace)
+    |> decrypt_repeating_key_xor(2, 40)
   end
 
 end
