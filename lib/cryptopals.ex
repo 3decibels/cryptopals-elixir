@@ -127,7 +127,11 @@ defmodule Cryptopals do
   Returns the decrypted plaintext and the key
   """
   def decrypt_repeating_key_xor(data, min_keysize, max_keysize) when is_binary(data) and is_integer(min_keysize) and is_integer(max_keysize) do
-    Cryptopals.Util.find_average_hamming_distances(data, 2..40)
+    for {keysize, _distance} <- Cryptopals.Util.find_average_hamming_distances(data, 2..40) do
+      keysize
+    end
+    |> Enum.take(4)
+    |> Enum.map(&Cryptopals.transpose_blocks(&1, data))
     # |> MORE CHALLENGE 6 WORK HERE
   end
 
@@ -140,6 +144,18 @@ defmodule Cryptopals do
     File.read!(path)
     |> Base.decode64!(ignore: :whitespace)
     |> decrypt_repeating_key_xor(2, 40)
+  end
+
+
+  @doc """
+  Takes a blob of data and transposes it into a number of blocks matching the keysize.
+  Ex: For a keysize of 5, a block of data will be transposed into 5 blocks.
+      Block 1 would have every 1st byte, block 2 every 2nd byte etc.
+  """
+  def transpose_blocks(keysize, data) when is_integer(keysize) and is_binary(data) do
+    for block <- 1..keysize do
+      Cryptopals.Util.create_block_from_data(data, keysize, block)
+    end
   end
 
 end

@@ -34,7 +34,7 @@ defmodule Cryptopals.Util do
   end
 
 
-  defp hamming_distance(_, _, acc), do: acc
+  defp hamming_distance(_x, _y, acc), do: acc
 
 
   @doc """
@@ -86,5 +86,26 @@ defmodule Cryptopals.Util do
     end)
     |> Enum.sort(fn {_keysize_x, norm_distance_x}, {_keysize_y, norm_distance_y} -> norm_distance_x <= norm_distance_y end)
   end
+
+
+  @doc """
+  Returns a block of transposed data based on the requested keysize and block position
+  """
+  def create_block_from_data(data, keysize, block) when is_binary(data) and is_integer(keysize) and is_integer(block) and keysize >= block do
+    #create_block_from_data(data, keysize, block, <<>>)
+    offset = block - 1
+    <<_::bytes-size(offset), block_data::8, tail::binary>> = data
+    create_block_from_data(tail, keysize, block, <<block_data>>)
+  end
+
+
+  defp create_block_from_data(data, keysize, block, acc) when byte_size(data) >= keysize do
+    offset = keysize - 1
+    <<_::bytes-size(offset), block_data::8, tail::binary>> = data
+    create_block_from_data(tail, keysize, block, acc <> <<block_data>>)
+  end
+
+
+  defp create_block_from_data(_data, _keysize, _block, acc), do: acc
 
 end
