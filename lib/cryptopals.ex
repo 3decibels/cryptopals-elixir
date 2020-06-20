@@ -60,9 +60,9 @@ defmodule Cryptopals do
         {score, char, plaintext}
     end
 
-    [{score, _char, decrypted_plaintext} | _tail] = Enum.sort plaintexts, fn({x, _, _}, {y, _, _}) -> x <= y end
+    [{score, char, decrypted_plaintext} | _tail] = Enum.sort plaintexts, fn({x, _, _}, {y, _, _}) -> x <= y end
     
-    {decrypted_plaintext, score}
+    {decrypted_plaintext, char, score}
   end
 
 
@@ -91,7 +91,7 @@ defmodule Cryptopals do
     |> Stream.map(&String.trim/1)
     |> Stream.map(&(Base.decode16!(&1, case: :lower)))
     |> Stream.map(&Cryptopals.decrypt_single_xored_ciphertext/1)
-    |> Enum.reduce(fn({_, x_score} = x, {_, y_score} = y) ->
+    |> Enum.reduce(fn({_, _, x_score} = x, {_, _, y_score} = y) ->
         cond do
           x_score <= y_score -> x
           true -> y
@@ -111,6 +111,8 @@ defmodule Cryptopals do
 
   """
   def repeating_key_xor(plaintext, key) when is_binary(plaintext) and is_binary(key) do
+    # TODO: This needs to be reworked. String.graphemes considers "\r\n" a single element, introducing an extra byte into :crypto.exor
+    # Should be redone as a recursive fuction similar to hamming_distance or create_block_from_data
     keylength = String.length(key)
     plaintext
     |> String.graphemes
@@ -126,24 +128,50 @@ defmodule Cryptopals do
   Reads in data and breaks repeating key XOR (Vigenere) encryption.
   Returns the decrypted plaintext and the key
   """
-  def decrypt_repeating_key_xor(data, min_keysize, max_keysize) when is_binary(data) and is_integer(min_keysize) and is_integer(max_keysize) do
-    for {keysize, _distance} <- Cryptopals.Util.find_average_hamming_distances(data, 2..40) do
-      keysize
-    end
-    |> Enum.take(4)
-    |> Enum.map(&Cryptopals.transpose_blocks(&1, data))
-    # |> MORE CHALLENGE 6 WORK HERE
+  def break_repeating_key_xor(data, min_keysize, max_keysize) when is_binary(data) and is_integer(min_keysize) and is_integer(max_keysize) do
+    {key, _score} = 
+      for {keysize, _distance} <- Cryptopals.Util.find_average_hamming_distances(data, 2..40) do
+        keysize
+      end
+      |> Stream.take(4)
+      |> Stream.map(&Cryptopals.transpose_blocks(&1, data))
+      |> Stream.map(&Cryptopals.find_xor_key_from_transposed_data/1)
+      |> Stream.map(fn {keysize, bestchars} -> 
+          {key, score} = Enum.reduce(bestchars, {"", 0}, fn {_plaintext, char, score}, {acc_key, acc_score} ->
+            {acc_key <> <<char>>, acc_score + score}
+          end)
+          {key, score / keysize}
+        end)
+      |> Enum.reduce(fn({_x_key, x_score} = x, {_y_key, y_score} = y) ->
+          cond do
+            x_score <= y_score -> x
+            true -> y
+          end
+        end)
+    key
   end
 
 
   @doc """
   Reads in base64 encoded data from a file and breaks repeating key XOR (Vigenere) encryption.
-  Returns the decrypted plaintext and the key
+  Returns the key used to encrypt the file.
   """
-  def decrypt_repeating_key_xor_from_file(path) when is_binary(path) do
+  def break_repeating_key_xor_from_file(path) when is_binary(path) do
     File.read!(path)
     |> Base.decode64!(ignore: :whitespace)
-    |> decrypt_repeating_key_xor(2, 40)
+    |> break_repeating_key_xor(2, 40)
+  end
+
+
+  @doc """
+  Reads in base64 encoded data from a file and breaks repeating key XOR (Vignere) encryption.
+  Returns the decrypted plaintext.
+  """
+  def decrypt_repeating_key_xor_from_file(path) when is_binary(path) do
+    key = Cryptopals.break_repeating_key_xor_from_file(path)
+    File.read!(path)
+    |> Base.decode64!(ignore: :whitespace)
+    |> Cryptopals.repeating_key_xor(key)
   end
 
 
@@ -153,9 +181,19 @@ defmodule Cryptopals do
       Block 1 would have every 1st byte, block 2 every 2nd byte etc.
   """
   def transpose_blocks(keysize, data) when is_integer(keysize) and is_binary(data) do
-    for block <- 1..keysize do
+    transposed = for block <- 1..keysize do
       Cryptopals.Util.create_block_from_data(data, keysize, block)
     end
+    {keysize, transposed}
+  end
+
+
+  @doc """
+  Takes data broken into blocks and determines the most likely character used as the key for each block
+  """
+  def find_xor_key_from_transposed_data({keysize, data}) when is_integer(keysize) and is_list(data) do
+    result = Enum.map(data, &Cryptopals.decrypt_single_xored_ciphertext/1)
+    {keysize, result}
   end
 
 end

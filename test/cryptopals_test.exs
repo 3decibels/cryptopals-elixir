@@ -18,22 +18,30 @@ defmodule CryptopalsTest do
   @tag set: 1
   @tag challenge: 3
   test "Single-byte XOR cipher" do
-    {plaintext, _score} = Cryptopals.decrypt_single_xored_hex("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
+    {plaintext, char, _score} = Cryptopals.decrypt_single_xored_hex("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
     assert plaintext == "Cooking MC's like a pound of bacon"
+    assert char == 88
   end
 
   @tag set: 1
   @tag challenge: 4
   test "Detect single-character XOR" do
-    {plaintext, _score} = Cryptopals.detect_xor_from_file("data/4.txt")
+    {plaintext, char, _score} = Cryptopals.detect_xor_from_file("data/4.txt")
     assert plaintext == "Now that the party is jumping\n"
+    assert char == 53
   end
 
   @tag set: 1
   @tag challenge: 5
-  test "Implement repeating-key XOR"do
+  test "Implement repeating-key XOR" do
     ciphertext = Cryptopals.repeating_key_xor("Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal", "ICE")
     assert ciphertext == "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"
+  end
+
+  @tag set: 1
+  @tag challenge: 6
+  test "Break repeating-key XOR" do
+    assert Cryptopals.break_repeating_key_xor_from_file("data/6.txt") == "Terminator X: Bring the noise"
   end
 
 end

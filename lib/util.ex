@@ -92,7 +92,6 @@ defmodule Cryptopals.Util do
   Returns a block of transposed data based on the requested keysize and block position
   """
   def create_block_from_data(data, keysize, block) when is_binary(data) and is_integer(keysize) and is_integer(block) and keysize >= block do
-    #create_block_from_data(data, keysize, block, <<>>)
     offset = block - 1
     <<_::bytes-size(offset), block_data::8, tail::binary>> = data
     create_block_from_data(tail, keysize, block, <<block_data>>)
