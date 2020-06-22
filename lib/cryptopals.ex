@@ -111,15 +111,7 @@ defmodule Cryptopals do
 
   """
   def repeating_key_xor(plaintext, key) when is_binary(plaintext) and is_binary(key) do
-    # TODO: This needs to be reworked. String.graphemes considers "\r\n" a single element, introducing an extra byte into :crypto.exor
-    # Should be redone as a recursive fuction similar to hamming_distance or create_block_from_data
-    keylength = String.length(key)
-    plaintext
-    |> String.graphemes
-    |> Stream.chunk_every(keylength)
-    |> Enum.reduce("", fn(x, acc) ->
-        acc <> :crypto.exor(x, String.slice(key, 0..(Enum.count(x) - 1)))
-      end)
+    Cryptopals.Util.repeating_key_xor(plaintext, key)
     |> Base.encode16(case: :lower)
   end
 
@@ -171,7 +163,7 @@ defmodule Cryptopals do
     key = Cryptopals.break_repeating_key_xor_from_file(path)
     File.read!(path)
     |> Base.decode64!(ignore: :whitespace)
-    |> Cryptopals.repeating_key_xor(key)
+    |> Cryptopals.Util.repeating_key_xor(key)
   end
 
 

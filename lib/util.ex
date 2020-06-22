@@ -107,4 +107,26 @@ defmodule Cryptopals.Util do
 
   defp create_block_from_data(_data, _keysize, _block, acc), do: acc
 
+
+  @doc """
+  Performs an XOR on a binary using a repeating key
+  """
+  def repeating_key_xor(data, key) when is_binary(data) and is_binary(key) do
+    repeating_key_xor(data, key, <<>>)
+  end
+
+
+  defp repeating_key_xor(data, key, acc) when is_binary(data) and is_binary(key) and byte_size(data) >= byte_size(key) do
+    keysize = byte_size(key)
+    <<segment::bytes-size(keysize), tail::binary>> = data
+    repeating_key_xor(tail, key, acc <> :crypto.exor(segment, key))
+  end
+
+
+  defp repeating_key_xor(data, key, acc) when is_binary(data) and is_binary(key) and byte_size(data) < byte_size(key) do
+    datasize = byte_size(data)
+    <<keysegment::bytes-size(datasize), _::binary>> = key
+    acc <> :crypto.exor(data, keysegment)
+  end
+
 end

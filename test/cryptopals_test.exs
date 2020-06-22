@@ -1,5 +1,5 @@
 defmodule CryptopalsTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Cryptopals
   doctest Cryptopals.Util
 
