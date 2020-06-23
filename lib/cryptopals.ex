@@ -188,4 +188,17 @@ defmodule Cryptopals do
     {keysize, result}
   end
 
+
+  @doc """
+  Decrypts a ciphertext from a base64 encoded file using AES-ECB-128
+  """
+  def decrypt_aes_ecb_from_file(path, key) when is_binary(path) and is_binary(key) do
+    data = 
+      File.read!(path)
+      |> Base.decode64!(ignore: :whitespace)
+    
+    :crypto.crypto_one_time(:aes_128_ecb, key, data, false)
+  end
+
+
 end

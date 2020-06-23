@@ -44,4 +44,11 @@ defmodule CryptopalsTest do
     assert Cryptopals.break_repeating_key_xor_from_file("data/6.txt") == "Terminator X: Bring the noise"
   end
 
+  @tag set: 1
+  @tag challenge: 7
+  test "AES in ECB mode" do
+    data = Cryptopals.decrypt_aes_ecb_from_file("data/7.txt", "YELLOW SUBMARINE")
+    assert String.contains?(data, "I'm back and I'm ringin' the bell \nA rockin' on the mike while the fly girls yell \n")
+  end
+
 end
