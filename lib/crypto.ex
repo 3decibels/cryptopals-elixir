@@ -46,9 +46,18 @@ defmodule Cryptopals.Crypto do
   defp aes_cbc(data, key, previous, encrypt, acc) when byte_size(data) >= byte_size(key) do
     blocksize = byte_size(key)
     <<block::bytes-size(blocksize), tail::binary>> = data
-    block = :crypto.exor(block, previous)
-    acc <> :crypto.crypto_one_time(:aes_128_ecb, key, block, encrypt)
-    aes_cbc(tail, key, block, encrypt, acc)
+    finished_block =
+      case encrypt do
+        true ->
+          :crypto.exor(:crypto.crypto_one_time(:aes_128_ecb, key, block, encrypt), previous)
+        false -> 
+          :crypto.crypto_one_time(:aes_128_ecb, key, :crypto.exor(block, previous), encrypt)
+      end
+    acc = acc <> finished_block
+    case encrypt do
+      true  -> aes_cbc(tail, key, finished_block, encrypt, acc)
+      false -> aes_cbc(tail, key, block, encrypt, acc)
+    end
   end
 
 
