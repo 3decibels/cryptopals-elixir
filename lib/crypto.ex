@@ -43,7 +43,7 @@ defmodule Cryptopals.Crypto do
   defp aes_cbc(data, key, previous, :encrypt, acc) when byte_size(data) >= byte_size(key) do
     blocksize = byte_size(key)
     <<block::bytes-size(blocksize), tail::binary>> = data
-    block = :crypto.exor(:crypto.crypto_one_time(:aes_128_ecb, key, block, true), previous)
+    block = :crypto.crypto_one_time(:aes_128_ecb, key, :crypto.exor(block, previous), true)
     acc = acc <> block
     aes_cbc(tail, key, block, :encrypt, acc)
   end
@@ -52,7 +52,7 @@ defmodule Cryptopals.Crypto do
   defp aes_cbc(data, key, previous, :decrypt, acc) when byte_size(data) >= byte_size(key) do
     blocksize = byte_size(key)
     <<block::bytes-size(blocksize), tail::binary>> = data
-    finished_block = :crypto.crypto_one_time(:aes_128_ecb, key, :crypto.exor(block, previous), false)
+    finished_block = :crypto.exor(:crypto.crypto_one_time(:aes_128_ecb, key, block, false), previous)
     acc = acc <> finished_block
     aes_cbc(tail, key, block, :decrypt, acc)
   end
@@ -64,7 +64,7 @@ defmodule Cryptopals.Crypto do
   @doc """
   Checks that the byte size of a given key is a multiple of 16
   """
-  defp check_key_size(key) when is_binary(key) do
+  def check_key_size(key) when is_binary(key) do
     cond do
       rem(byte_size(key), 16) == 0 -> {:ok, key}
       true -> {:error, "Bad keysize"}

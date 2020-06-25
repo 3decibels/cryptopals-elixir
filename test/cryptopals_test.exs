@@ -65,4 +65,11 @@ defmodule CryptopalsTest do
     assert <<89, 69, 76, 76, 79, 87, 32, 83, 85, 66, 77, 65, 82, 73, 78, 69, 4, 4, 4, 4>> == Cryptopals.Crypto.pad_pkcs7("YELLOW SUBMARINE", 20)
   end
 
+  @tag set: 2
+  @tag challenge: 10
+  test "" do
+    result = Cryptopals.decrypt_aes_ecb_from_file("data/10.txt", "YELLOW SUBMARINE", :binary.copy(<<0>>, 16))
+    assert String.starts_with?(result, "I'm back and I'm ringin' the bell \nA rockin' on the mike while the fly girls yell \n")
+  end
+
 end

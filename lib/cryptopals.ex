@@ -221,4 +221,16 @@ defmodule Cryptopals do
   end
 
 
+  @doc """
+  Decrypts a ciphertext from a base64 encoded file using AES-CBC-128
+  """
+  def decrypt_aes_ecb_from_file(path, key, iv) when is_binary(path) and is_binary(key) do
+    data = 
+      File.read!(path)
+      |> Base.decode64!(ignore: :whitespace)
+    
+    Cryptopals.Crypto.aes_cbc(data, key, iv, :decrypt)
+  end
+
+
 end
