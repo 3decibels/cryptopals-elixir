@@ -204,4 +204,16 @@ defmodule Cryptopals.Util do
 
   def has_duplicate?(_data, _chunk), do: false
 
+
+  @doc """
+  Random byte generator.
+
+  Generates a binary of a specified size with random bytes 0-255.
+  """
+  def generate_random_bytes(size) when is_integer(size) do
+    for _ <- 1..size, into: <<>> do
+      <<:random.uniform(256) - 1>>
+    end
+  end
+
 end
