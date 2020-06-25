@@ -25,12 +25,12 @@ defmodule Cryptopals.Util do
 
 
   defp hamming_distance(<<x::1, x_tail::bitstring>>, <<y::1, y_tail::bitstring>>, acc) do
-    cond do
-      x == y ->
-        hamming_distance(x_tail, y_tail, acc)
-      true ->
-        hamming_distance(x_tail, y_tail, acc + 1)
-    end
+    acc =
+      case x == y do
+        true  -> acc
+        false -> acc + 1
+      end
+    hamming_distance(x_tail, y_tail, acc)
   end
 
 
@@ -156,12 +156,12 @@ defmodule Cryptopals.Util do
 
   defp count_duplicates(data, chunk_size, acc) when byte_size(data) > chunk_size * 2 do
     <<chunk::bytes-size(chunk_size), tail::binary>> = data
-    cond do
-      has_duplicate?(tail, chunk) ->
-        count_duplicates(tail, chunk_size, acc + 1)
-      true ->
-        count_duplicates(tail, chunk_size, acc)
-    end
+    acc =
+      case has_duplicate?(tail, chunk) do
+        true  -> acc + 1
+        false -> acc
+      end
+    count_duplicates(tail, chunk_size, acc)
   end
 
 
