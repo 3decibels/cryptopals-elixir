@@ -33,34 +33,42 @@ defmodule Cryptopals.Crypto do
   Takes in data, the encryption key, the IV and an atom specifying if the function is encrypting or decrypting (:encrypt or :decrypt)
   """
   def aes_cbc(data, key, iv, direction) when is_binary(data) and is_binary(key) and is_binary(iv) and is_atom(direction) and byte_size(key) == byte_size(iv) do
-    encrypt =
-      cond do
-        direction == :encrypt -> true
-        direction == :decrypt -> false
-        true -> raise ArgumentError, message: "Must pass either :encrypt or :decrypt as the direction"
-      end
-    aes_cbc(data, key, iv, encrypt, <<>>)
-  end
-
-
-  defp aes_cbc(data, key, previous, encrypt, acc) when byte_size(data) >= byte_size(key) do
-    blocksize = byte_size(key)
-    <<block::bytes-size(blocksize), tail::binary>> = data
-    finished_block =
-      case encrypt do
-        true ->
-          :crypto.exor(:crypto.crypto_one_time(:aes_128_ecb, key, block, encrypt), previous)
-        false -> 
-          :crypto.crypto_one_time(:aes_128_ecb, key, :crypto.exor(block, previous), encrypt)
-      end
-    acc = acc <> finished_block
-    case encrypt do
-      true  -> aes_cbc(tail, key, finished_block, encrypt, acc)
-      false -> aes_cbc(tail, key, block, encrypt, acc)
+    with {:ok, key} <- check_key_size(key)
+    do
+      aes_cbc(data, key, iv, direction, <<>>)
     end
   end
 
 
+  defp aes_cbc(data, key, previous, :encrypt, acc) when byte_size(data) >= byte_size(key) do
+    blocksize = byte_size(key)
+    <<block::bytes-size(blocksize), tail::binary>> = data
+    block = :crypto.exor(:crypto.crypto_one_time(:aes_128_ecb, key, block, true), previous)
+    acc = acc <> block
+    aes_cbc(tail, key, block, :encrypt, acc)
+  end
+
+
+  defp aes_cbc(data, key, previous, :decrypt, acc) when byte_size(data) >= byte_size(key) do
+    blocksize = byte_size(key)
+    <<block::bytes-size(blocksize), tail::binary>> = data
+    finished_block = :crypto.crypto_one_time(:aes_128_ecb, key, :crypto.exor(block, previous), false)
+    acc = acc <> finished_block
+    aes_cbc(tail, key, block, :decrypt, acc)
+  end
+
+
   defp aes_cbc(_data, _key, _previous, _encrypt, acc), do: acc
+
+
+  @doc """
+  Checks that the byte size of a given key is a multiple of 16
+  """
+  defp check_key_size(key) when is_binary(key) do
+    cond do
+      rem(byte_size(key), 16) == 0 -> {:ok, key}
+      true -> {:error, "Bad keysize"}
+    end
+  end
 
 end
