@@ -1,6 +1,7 @@
 defmodule CryptopalsTest do
   use ExUnit.Case, async: true
   doctest Cryptopals
+  doctest Cryptopals.Crypto
   doctest Cryptopals.Util
 
   @tag set: 1
@@ -56,6 +57,12 @@ defmodule CryptopalsTest do
   test "Detect AES in ECB mode" do
     {_count, hex} = Cryptopals.detect_aes_ecb_from_file("data/8.txt")
     assert String.starts_with?(hex, "d880619740a8a19b7840a8a31c810a3d08649af70dc06f4fd5d2d69c744cd283e2dd052f6b641dbf9d11b0348542bb57086")
+  end
+
+  @tag set: 2
+  @tag challenge: 9
+  test "Implement PKCS#7 padding" do
+    assert <<89, 69, 76, 76, 79, 87, 32, 83, 85, 66, 77, 65, 82, 73, 78, 69, 4, 4, 4, 4>> == Cryptopals.Crypto.pad_pkcs7("YELLOW SUBMARINE", 20)
   end
 
 end
