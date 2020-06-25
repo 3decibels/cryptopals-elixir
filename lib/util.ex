@@ -129,4 +129,76 @@ defmodule Cryptopals.Util do
     acc <> :crypto.exor(data, keysegment)
   end
 
+
+  @doc """
+  Searches the supplied binary for the number of duplicate byte sequences it contains.
+  Takes the binary to search and the size of the byte chunks to search for duplicates of.
+
+    ## Examples
+
+      iex> Cryptopals.Util.count_duplicates("AAABBBCCCAAADDDAAABBB", 3)
+      2
+      iex> Cryptopals.Util.count_duplicates("AAABBBCCCAAADDDAAABBB", 2)
+      3
+      iex> Cryptopals.Util.count_duplicates("AAABBBCCCAAADDDAAABBB", 4)
+      0
+      iex> Cryptopals.Util.count_duplicates("AAABBBCCCAAADDDAAABBB", 1)
+      16
+
+  """
+  def count_duplicates(data, chunk_size) when is_binary(data) and is_integer(chunk_size) and byte_size(data) > chunk_size * 2 do
+    count_duplicates(data, chunk_size, 0)
+  end
+
+
+  defp count_duplicates(data, chunk_size, acc) when byte_size(data) > chunk_size * 2 do
+    <<chunk::bytes-size(chunk_size), tail::binary>> = data
+    cond do
+      has_duplicate?(tail, chunk) ->
+        count_duplicates(tail, chunk_size, acc + 1)
+      true ->
+        count_duplicates(tail, chunk_size, acc)
+    end
+  end
+
+
+  defp count_duplicates(_data, _chunk_size, acc), do: acc
+
+
+  @doc """
+  Searches the supplied data for the supplied chunk.
+
+  This function searches only on chunk boundaries, with the size of the chunk defining the boundary size.
+  Ex: For a 4-byte chunk, each 4-byte segment of the data will be considered separately
+
+    ## Examples
+
+      iex> Cryptopals.Util.has_duplicate?("AAABBBCCCAAADDD", "AAA")
+      true
+      iex> Cryptopals.Util.has_duplicate?("AAABBBCCCAAADDD", "FFF")
+      false
+      iex> Cryptopals.Util.has_duplicate?("AAABBBCCCAAADDD", "AAAA")
+      false
+      iex> Cryptopals.Util.has_duplicate?("AAABBBCCCAAADDD", "AAAB")
+      true
+      iex> Cryptopals.Util.has_duplicate?("AAABBBCCCAAADDD", "BBBC")
+      false
+      iex> Cryptopals.Util.has_duplicate?("AAABBBCCCAAADDD", "BBCC")
+      true
+
+  """
+  def has_duplicate?(data, chunk) when is_binary(data) and is_binary(chunk) and byte_size(data) > byte_size(chunk) do
+    chunk_size = byte_size(chunk)
+    <<comparison_chunk::bytes-size(chunk_size), tail::binary>> = data
+    cond do
+      comparison_chunk == chunk ->
+        true
+      true ->
+        has_duplicate?(tail, chunk)
+    end
+  end
+
+
+  def has_duplicate?(_data, _chunk), do: false
+
 end
