@@ -48,7 +48,14 @@ defmodule CryptopalsTest do
   @tag challenge: 7
   test "AES in ECB mode" do
     data = Cryptopals.decrypt_aes_ecb_from_file("data/7.txt", "YELLOW SUBMARINE")
-    assert String.contains?(data, "I'm back and I'm ringin' the bell \nA rockin' on the mike while the fly girls yell \n")
+    assert String.starts_with?(data, "I'm back and I'm ringin' the bell \nA rockin' on the mike while the fly girls yell \n")
+  end
+
+  @tag set: 1
+  @tag challenge: 8
+  test "Detect AES in ECB mode" do
+    {_count, hex} = Cryptopals.detect_aes_ecb_from_file("data/8.txt")
+    assert String.starts_with?(hex, "d880619740a8a19b7840a8a31c810a3d08649af70dc06f4fd5d2d69c744cd283e2dd052f6b641dbf9d11b0348542bb57086")
   end
 
 end

@@ -151,6 +151,9 @@ defmodule Cryptopals.Util do
   end
 
 
+  def count_duplicates(data, chunk_size) when is_binary(data) and is_integer(chunk_size), do: 0
+
+
   defp count_duplicates(data, chunk_size, acc) when byte_size(data) > chunk_size * 2 do
     <<chunk::bytes-size(chunk_size), tail::binary>> = data
     cond do

@@ -201,4 +201,24 @@ defmodule Cryptopals do
   end
 
 
+  @doc """
+  Detects which line in a file of hex encoded ciphertexts has been encrypted with AES in ECB mode
+  """
+  def detect_aes_ecb_from_file(path) when is_binary(path) do
+    File.read!(path)
+    |> String.downcase
+    |> String.split("\n")
+    |> Stream.map(fn hex ->
+        duplicate_count = Cryptopals.Util.count_duplicates(Base.decode16!(hex, case: :lower), 8)
+        {duplicate_count, hex}
+      end)
+    |> Enum.reduce(fn({x_count, _x_hex} = x, {y_count, _y_hex} = y) ->
+        cond do
+          x_count >= y_count -> x
+          true -> y
+        end
+      end)
+  end
+
+
 end
