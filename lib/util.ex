@@ -75,16 +75,34 @@ defmodule Cryptopals.Util do
 
   """
   def find_average_hamming_distances(data, %Range{} = range, rounds) when is_binary(data) do
-    Stream.map(range, fn keysize ->
-      total_norm_distance = Enum.reduce(0..(rounds - 1), 0, fn iteration, acc ->
+    Stream.map(range, &Cryptopals.Util.find_average_hamming_distance(data, &1, rounds))
+    |> Enum.sort(fn {_keysize_x, norm_distance_x}, {_keysize_y, norm_distance_y} -> norm_distance_x <= norm_distance_y end)
+  end
+
+
+  @doc """
+  Finds the average Hamming distance on a ciphertext for a given key size
+  Computes a selectable number rounds of Hamming distance, comparing (rounds + 1) keysize blocks
+  Returns a tuple with the keysize and average Hamming distance
+
+    ## Examples
+
+      iex> Cryptopals.Util.find_average_hamming_distance("String for testing Hamming distance", 4, 5)
+      {4, 2.65}
+      iex> Cryptopals.Util.find_average_hamming_distance("String for testing Hamming distance", 5, 5)
+      {5, 2.6000000000000005}
+      iex> Cryptopals.Util.find_average_hamming_distance("String for testing Hamming distance", 6, 4)
+      {6, 3.2083333333333335}
+
+  """
+  def find_average_hamming_distance(data, keysize, rounds) when is_binary(data) and is_integer(keysize) and is_integer(rounds) and rounds > 0 do
+    total_norm_distance = Enum.reduce(0..(rounds - 1), 0, fn iteration, acc ->
         offset = keysize * iteration
         <<_::bytes-size(offset), x::bytes-size(keysize), y::bytes-size(keysize), _::binary>> = data
         acc + (Cryptopals.Util.hamming_distance(x, y) / keysize)
       end)
-      avg_norm_distance = total_norm_distance / rounds
-      {keysize, avg_norm_distance}
-    end)
-    |> Enum.sort(fn {_keysize_x, norm_distance_x}, {_keysize_y, norm_distance_y} -> norm_distance_x <= norm_distance_y end)
+    avg_norm_distance = total_norm_distance / rounds
+    {keysize, avg_norm_distance}
   end
 
 
