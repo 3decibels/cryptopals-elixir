@@ -67,9 +67,15 @@ defmodule CryptopalsTest do
 
   @tag set: 2
   @tag challenge: 10
-  test "" do
+  test "Implement CBC mode" do
     result = Cryptopals.decrypt_aes_ecb_from_file("data/10.txt", "YELLOW SUBMARINE", :binary.copy(<<0>>, 16))
     assert String.starts_with?(result, "I'm back and I'm ringin' the bell \nA rockin' on the mike while the fly girls yell \n")
+  end
+
+  @tag set: 2
+  @tag challenge: 11
+  test "ECB/CBC detection oracle" do
+    assert Cryptopals.aes_mode_encryption_and_detection_oracle() == true
   end
 
 end

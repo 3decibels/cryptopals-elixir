@@ -225,12 +225,53 @@ defmodule Cryptopals do
   Decrypts a ciphertext from a base64 encoded file using AES-CBC-128
   """
   def decrypt_aes_ecb_from_file(path, key, iv) when is_binary(path) and is_binary(key) do
-    data = 
-      File.read!(path)
-      |> Base.decode64!(ignore: :whitespace)
-    
-    Cryptopals.Crypto.aes_cbc(data, key, iv, :decrypt)
+    File.read!(path)
+    |> Base.decode64!(ignore: :whitespace)
+    |> Cryptopals.Crypto.aes_cbc(key, iv, :decrypt)
   end
 
+
+  @doc """
+  Encrypts a plaintext with AES under a random key, also randomly selecting ECB or CBC for the mode.
+
+  Creates a random 16 byte key and encrypts the plaintext using ECB or CBC mode randomly. Each mode has a 50% chance of being selected.
+  If CBC is selected a random 16 byte IV will be generated for use. Before encryption the plaintext will have 5-10 random bytes added to
+  the beginning and end. Each addition is generated separately.
+  """
+  def encryption_oracle(plaintext) when is_binary(plaintext) do
+    key = Cryptopals.Util.generate_random_bytes(16)
+    plaintext = Cryptopals.Util.generate_random_bytes(:random.uniform(5) + 5) <> plaintext
+    plaintext = plaintext <> Cryptopals.Util.generate_random_bytes(:random.uniform(5) + 5)
+    cond do
+      :random.uniform(2) == 2 ->
+        ciphertext = Cryptopals.Crypto.aes_cbc(plaintext, key, Cryptopals.Util.generate_random_bytes(16), :encrypt)
+        {ciphertext, :CBC}
+      true ->
+        ciphertext = :crypto.crypto_one_time(:aes_128_ecb, key, plaintext, true)
+        {ciphertext, :ECB}
+    end
+  end
+
+
+  @doc """
+  Determines whether a ciphertext encrypted using AES used either ECB or CBC mode.
+  """
+  def ecb_cbc_detection_oracle(ciphertext, blocksize) when is_binary(ciphertext) do
+    case Cryptopals.Util.count_duplicates(ciphertext, blocksize) do
+      0 -> :CBC
+      _ -> :ECB
+    end
+  end
+
+
+  @doc """
+  Randomly encrypts a base64 encoded plaintext and determines if it was encrypted with either AES-ECB or AES-CBC.
+  Returns true if the detection was correct, false if incorrect
+  """
+  def aes_mode_encryption_and_detection_oracle() do
+    {ciphertext, mode} = Cryptopals.encryption_oracle(String.duplicate("A", 52))
+    detected_mode = Cryptopals.ecb_cbc_detection_oracle(ciphertext, 16)
+    mode == detected_mode
+  end
 
 end
