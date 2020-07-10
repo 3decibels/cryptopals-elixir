@@ -240,8 +240,8 @@ defmodule Cryptopals do
   """
   def encryption_oracle(plaintext) when is_binary(plaintext) do
     key = Cryptopals.Util.generate_random_bytes(16)
-    plaintext = Cryptopals.Util.generate_random_bytes(:random.uniform(5) + 5) <> plaintext
-    plaintext = plaintext <> Cryptopals.Util.generate_random_bytes(:random.uniform(5) + 5)
+    plaintext = Cryptopals.Util.generate_random_bytes(:random.uniform(6) + 4) <> plaintext
+    plaintext = plaintext <> Cryptopals.Util.generate_random_bytes(:random.uniform(6) + 4)
     cond do
       :random.uniform(2) == 2 ->
         ciphertext = Cryptopals.Crypto.aes_cbc(plaintext, key, Cryptopals.Util.generate_random_bytes(16), :encrypt)
