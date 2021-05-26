@@ -122,7 +122,7 @@ defmodule Cryptopals do
   """
   def break_repeating_key_xor(data, min_keysize, max_keysize) when is_binary(data) and is_integer(min_keysize) and is_integer(max_keysize) do
     {key, _score} = 
-      for {keysize, _distance} <- Cryptopals.Util.find_average_hamming_distances(data, 2..40) do
+      for {keysize, _distance} <- Cryptopals.Util.find_average_hamming_distances(data, min_keysize..max_keysize) do
         keysize
       end
       |> Stream.take(4)
